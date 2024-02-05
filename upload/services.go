@@ -28,7 +28,7 @@ func (c *Controller) serve(w http.ResponseWriter, r *http.Request) {
 	// TODO check user id, to serve private folder
 
 	w.Header().Add("Cache-Control", "private, max-age=31536000, immutable")
-	http.FileServer(http.Dir(c.UploadDir)).ServeHTTP(w, r)
+	http.StripPrefix("/upload/", http.FileServer(http.Dir(c.UploadDir))).ServeHTTP(w, r)
 }
 
 // HANDLE UPLOAD ------------------------------------------------------------------

@@ -106,7 +106,7 @@ func (c *Controller) handle(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 
-					fileName := id.String() + ".png" // filepath.Ext(fileHeader.Filename)
+					fileName := id.String() + ".jpg" // filepath.Ext(fileHeader.Filename)
 					originalOutputLocation := ""
 
 					// Create sizes
@@ -130,7 +130,7 @@ func (c *Controller) handle(w http.ResponseWriter, r *http.Request) {
 							// Write the original as PNG
 							if size == Original {
 
-								if err := png.Encode(outFile, img); err != nil {
+								if err := jpeg.Encode(outFile, img, &jpeg.Options{Quality: 100}); err != nil {
 									errorSizesChan <- err
 									return
 								}
@@ -147,7 +147,7 @@ func (c *Controller) handle(w http.ResponseWriter, r *http.Request) {
 								if intSize >= max(imgWidth, imgHeight) {
 
 									// Return original if smaller than target size
-									if err := png.Encode(outFile, img); err != nil {
+									if err := jpeg.Encode(outFile, img, nil); err != nil {
 										errorSizesChan <- err
 										return
 									}
@@ -163,10 +163,10 @@ func (c *Controller) handle(w http.ResponseWriter, r *http.Request) {
 									}
 
 									// Resize
-									draw.ApproxBiLinear.Scale(dst, dst.Rect, img, img.Bounds(), draw.Over, nil)
+									draw.BiLinear.Scale(dst, dst.Rect, img, img.Bounds(), draw.Over, nil)
 
-									// Encode to png
-									if err := png.Encode(outFile, dst); err != nil {
+									// Encode to jpeg
+									if err := jpeg.Encode(outFile, dst, nil); err != nil {
 										errorSizesChan <- err
 										return
 									}
